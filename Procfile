@@ -1,0 +1,1 @@
+web: python bot_rev_2.py
