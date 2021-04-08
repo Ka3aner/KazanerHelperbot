@@ -1,6 +1,6 @@
 import telebot
 import json
-bot = telebot.types.TeleBot('1648049575:AAHXqNdI4iA7f0h-kdpGRYpM4Kdfy_Pri64')
+bot = telebot.types.telebot('1648049575:AAHXqNdI4iA7f0h-kdpGRYpM4Kdfy_Pri64')
 
 markup = types.ReplyKeyboardRemove()
 
