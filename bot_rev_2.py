@@ -1,8 +1,9 @@
 import telebot
+from telebot import types
 import json
 bot = telebot.TeleBot('1648049575:AAHXqNdI4iA7f0h-kdpGRYpM4Kdfy_Pri64')
 
-markup = telebot.types.ReplyKeyboardRemove()
+markup = types.ReplyKeyboardRemove()
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
