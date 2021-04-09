@@ -4,3 +4,5 @@ idna==2.10
 requests==2.25.1
 urllib3==1.26.3
 pyTelegramBotAPI==3.5.2
+virtualenv==15.1.0
+virtualenv-clone==0.3.0
