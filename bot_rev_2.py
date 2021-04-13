@@ -31,27 +31,35 @@ def send_text(message):
         markup_delete = telebot.types.ReplyKeyboardMarkup(row_width=2)
         with open('database.json', 'r', encoding="utf-8") as f:
             database = json.load(f)
-        list = database['persons'][str(message.chat.id)]
-        f.close()
-        for i in range(0, len(list)):
-            itembtn = telebot.types.KeyboardButton(i+1)
-            markup_delete.add(itembtn)
-        message = bot.send_message(message.chat.id, "Что удаляем?", reply_markup=markup_delete)
-        bot.register_next_step_handler(message, delete_work)
+        try:
+            list = database['persons'][str(message.chat.id)]
+            f.close()
+        except KeyError:
+            pass
+        else:
+            for i in range(0, len(list)):
+                itembtn = telebot.types.KeyboardButton(i+1)
+                markup_delete.add(itembtn)
+            message = bot.send_message(message.chat.id, "Что удаляем?", reply_markup=markup_delete)
+            bot.register_next_step_handler(message, delete_work)
     elif message.text.lower() == 'изменить задачу':
         worklist(message)
         markup_edit = telebot.types.ReplyKeyboardMarkup(row_width=2)
         with open('database.json', 'r', encoding="utf-8") as f:
             database = json.load(f)
-        list = database['persons'][str(message.chat.id)]
-        f.close()
-        for i in range(0, len(list)):
-            itembtn = telebot.types.KeyboardButton(i + 1)
-            markup_edit.add(itembtn)
-        message = bot.send_message(message.chat.id, """\
-        Изменения - это хорошо. Нечего сидеть на месте! Напиши номер задачи, которую нужно удалить.
-        """, reply_markup=markup_edit)
-        bot.register_next_step_handler(message, edit_work)
+        try:
+            list = database['persons'][str(message.chat.id)]
+            f.close()
+        except KeyError:
+            pass
+        else:
+            for i in range(0, len(list)):
+                itembtn = telebot.types.KeyboardButton(i + 1)
+                markup_edit.add(itembtn)
+            message = bot.send_message(message.chat.id, """\
+            Изменения - это хорошо. Нечего сидеть на месте! Напиши номер задачи, которую нужно удалить.
+            """, reply_markup=markup_edit)
+            bot.register_next_step_handler(message, edit_work)
     else:
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
         
