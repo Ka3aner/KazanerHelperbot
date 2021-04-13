@@ -52,19 +52,26 @@ def send_text(message):
         Изменения - это хорошо. Нечего сидеть на месте! Напиши номер задачи, которую нужно удалить.
         """, reply_markup=markup_edit)
         bot.register_next_step_handler(message, edit_work)
+    else:
+        bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
+        
 
 def worklist(message):
     with open('database.json', 'r', encoding="utf-8") as f:
         database = json.load(f)
-    list = database['persons'][str(message.chat.id)]
-    f.close()
-    answer = 'Список ваших текущих задач:\n'
-    if len(list) == 0:
-        bot.send_message(message.chat.id, 'Ваш список дел пуст. Нажмите "Добавить задачу" и занесите первую задачу в список!')
+    try:
+        list = database['persons'][str(message.chat.id)]
+    except KeyError:
+        bot.send_message(message.chat.id, "Кажется, у вас ещё нет добавленных задач. Давайте сначала добавим первую задачу в список!")
     else:
-        for i in range(0, len(list)):
-            answer += f'{i + 1}. {list[i]}\n'
-        bot.send_message(message.chat.id, answer)
+        f.close()
+        answer = 'Список ваших текущих задач:\n'
+        if len(list) == 0:
+            bot.send_message(message.chat.id, 'Ваш список дел пуст. Нажмите "Добавить задачу" и занесите первую задачу в список!')
+        else:
+            for i in range(0, len(list)):
+                answer += f'{i + 1}. {list[i]}\n'
+            bot.send_message(message.chat.id, answer)
 
 def get_work(message):
     work = message.text
@@ -93,6 +100,8 @@ def delete_work(message):
             database['persons'][str(message.chat.id)].remove(database['persons'][str(message.chat.id)][num-1])
         except IndexError:
             bot.send_message(message.chat.id, "В вашем списке нет задачи с выбранным номером. Повторите удаление", reply_markup=markup)
+        except KeyError:
+            bot.send_message(message.chat.id, "Кажется, у вас ещё нет добавленных задач. Давайте сначала добавим первую задачу в список!")
         else:
             with open('database.json', 'w', encoding="utf-8") as f:
                 json.dump(database, f, indent=2, ensure_ascii=False)
@@ -118,6 +127,8 @@ def edit_work_step2(message):
         database['persons'][str(message.chat.id)][N - 1] = text
     except IndexError:
         bot.send_message(message.chat.id, "В вашем списке нет задачи с выбранным номером. Повторите изменение", reply_markup=markup)
+    except KeyError:
+        bot.send_message(message.chat.id, "Кажется, у вас ещё нет добавленных задач. Давайте сначала добавим первую задачу в список!")
     else:
         with open('database.json', 'w', encoding="utf-8") as f:
             json.dump(database, f, indent=2, ensure_ascii=False)
