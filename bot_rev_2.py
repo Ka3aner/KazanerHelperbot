@@ -7,8 +7,8 @@ markup = telebot.types.ReplyKeyboardRemove()
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.send_message(message.chat.id, """\
-Привет, я бот - планировщик! Я помогу тебе запоминать твои дела! Просто напиши мне 'Привет'\
-""")
+Привет, я бот - планировщик! Я помогу тебе запоминать твои дела! Я умею добавлять задачи в список дел, а также удалять выполненные и изменять, если требуется. Начнём? Выбери опцию из предложенного меню.\
+""", reply_markup=markup)
 
 markup = telebot.types.ReplyKeyboardMarkup(row_width=2)
 itembtn1 = telebot.types.KeyboardButton('Список задач')
@@ -19,9 +19,7 @@ markup.add(itembtn1, itembtn2, itembtn3, itembtn4)
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-    if message.text.lower() == 'привет':
-        bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
-    elif message.text.lower() == 'список задач':
+    if message.text.lower() == 'список задач':
         worklist(message)
     elif message.text.lower() == 'добавить задачу':
         message = bot.send_message(message.chat.id, "Какое дело добавляем, командир?")
@@ -61,7 +59,7 @@ def send_text(message):
             """, reply_markup=markup_edit)
             bot.register_next_step_handler(message, edit_work)
     else:
-        bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
+        bot.send_message(message.chat.id, "Кажется ты написал что-то другое, а не выбрал опцию... Выбери опцию правильно", reply_markup=markup)
         
 
 def worklist(message):
@@ -83,18 +81,23 @@ def worklist(message):
 
 def get_work(message):
     work = message.text
-    with open('database.json', 'r', encoding="utf-8") as f:
-        database = json.load(f)
-    if str(message.chat.id) in database['persons']:
-        database['persons'][str(message.chat.id)].append(work)
+    try:
+        work_str = str(work)
+    except:
+        bot.send_message(message.chat.id, "Мне кажется, что задача должна быть описана текстом. Давай попробуй ввести её ещё раз.")
     else:
-        database['persons'][str(message.chat.id)] = []
-        database['persons'][str(message.chat.id)].append(work)
-    with open('database.json', 'w', encoding="utf-8") as f:
-        json.dump(database, f, indent=2, ensure_ascii=False)
-    f.close()
-    bot.send_message(message.chat.id, "Это очень важное дело! И оно уже в твоём списке!")
-    worklist(message)
+        with open('database.json', 'r', encoding="utf-8") as f:
+            database = json.load(f)
+        if str(message.chat.id) in database['persons']:
+            database['persons'][str(message.chat.id)].append(work)
+        else:
+            database['persons'][str(message.chat.id)] = []
+            database['persons'][str(message.chat.id)].append(work)
+        with open('database.json', 'w', encoding="utf-8") as f:
+            json.dump(database, f, indent=2, ensure_ascii=False)
+        f.close()
+        bot.send_message(message.chat.id, "Это очень важное дело! И оно уже в твоём списке!")
+        worklist(message)
 
 def delete_work(message):
     try:
